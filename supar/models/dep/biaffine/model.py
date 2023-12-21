@@ -231,4 +231,7 @@ class BiaffineDependencyModel(Model):
             arc_preds[bad] = (DependencyCRF if proj else MatrixTree)(s_arc[bad], mask[bad].sum(-1)).argmax
         rel_preds = s_rel.argmax(-1).gather(-1, arc_preds.unsqueeze(-1)).squeeze(-1)
 
-        return arc_preds, rel_preds
+        # Index 0 is for root, the 1st token starts from index 1
+        rel_probs = s_rel[:, torch.arange(arc_preds.size(-1)), arc_preds.squeeze(0), :].softmax(-1)
+
+        return arc_preds, rel_preds, rel_probs

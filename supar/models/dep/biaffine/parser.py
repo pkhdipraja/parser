@@ -108,7 +108,7 @@ class BiaffineDependencyParser(Parser):
         mask[:, 0] = 0
         s_arc, s_rel = self.model(words, feats)
         loss = self.model.loss(s_arc, s_rel, arcs, rels, mask, self.args.partial)
-        arc_preds, rel_preds = self.model.decode(s_arc, s_rel, mask, self.args.tree, self.args.proj)
+        arc_preds, rel_preds, _ = self.model.decode(s_arc, s_rel, mask, self.args.tree, self.args.proj)
         if self.args.partial:
             mask &= arcs.ge(0)
         # ignore all punctuation if not specified
@@ -123,11 +123,12 @@ class BiaffineDependencyParser(Parser):
         # ignore the first token of each sentence
         mask[:, 0] = 0
         s_arc, s_rel = self.model(words, feats)
-        arc_preds, rel_preds = self.model.decode(s_arc, s_rel, mask, self.args.tree, self.args.proj)
+        arc_preds, rel_preds, rel_probs = self.model.decode(s_arc, s_rel, mask, self.args.tree, self.args.proj)
         batch.arcs = [i.tolist() for i in arc_preds[mask].split(lens)]
         batch.rels = [self.REL.vocab[i.tolist()] for i in rel_preds[mask].split(lens)]
         if self.args.prob:
             batch.probs = [prob[1:i+1, :i+1].cpu() for i, prob in zip(lens, s_arc.softmax(-1).unbind())]
+            batch.rel_attn = rel_probs
         return batch
 
     @classmethod

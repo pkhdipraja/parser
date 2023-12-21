@@ -399,6 +399,7 @@ class Parser(object):
         self.transform.eval()
         if args.prob:
             self.transform.append(Field('probs'))
+            self.transform.append(Field('rel_attn'))
 
         logger.info("Loading the data")
         if args.cache:
