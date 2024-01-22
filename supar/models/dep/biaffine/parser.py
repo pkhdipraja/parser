@@ -129,6 +129,8 @@ class BiaffineDependencyParser(Parser):
         if self.args.prob:
             batch.probs = [prob[1:i+1, :i+1].cpu() for i, prob in zip(lens, s_arc.softmax(-1).unbind())]
             batch.rel_attn = rel_probs
+            batch.s_rel = s_rel
+            batch.arc_preds = arc_preds
         return batch
 
     @classmethod

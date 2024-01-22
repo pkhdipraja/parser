@@ -400,6 +400,8 @@ class Parser(object):
         if args.prob:
             self.transform.append(Field('probs'))
             self.transform.append(Field('rel_attn'))
+            self.transform.append(Field('s_rel'))
+            self.transform.append(Field('arc_preds'))
 
         logger.info("Loading the data")
         if args.cache:
